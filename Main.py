@@ -8,14 +8,11 @@ class Snake:
         pg.init()
         self.screen = pg.display.set_mode((1400, 800))
         self.clock = pg.time.Clock()
-        self.running = False
-        self.position = [(695, 395)]
-        self.running = True
         self.position = [(695, 395), (695, 405), (695, 415)]
         self.snake_x: int = 695
         self.snake_y: int = 395
         self.direction: int = 0
-        self.snake_length: int = 1
+        self.snake_length: int = 3
         self.food: bool = False
         self.food_x: int = 0
         self.food_y: int = 0
@@ -50,14 +47,21 @@ class Snake:
         pg.display.update()
 
     def check_collision(self):
-        print(self.running)
         if (self.snake_x <= 0 or self.snake_x >= 1410
                 or self.snake_y <= 0 or self.snake_y >= 810):
-            self.running = False
+            self.position = [(695, 395), (695, 405), (695, 415)]
+            self.snake_length = 3
+            self.snake_x = 695
+            self.snake_y = 395
+            self.direction = 0
 
         for i in range(1, len(self.position)):
             if self.snake_x == self.position[i][0] and self.snake_y == self.position[i][1]:
-                self.running = False
+                self.position = [(695, 395), (695, 405), (695, 415)]
+                self.snake_length = 3
+                self.snake_x = 695
+                self.snake_y = 395
+                self.direction = 0
 
     def snake_logic(self):
         for i in range(10):
@@ -98,12 +102,10 @@ class Snake:
             pg.draw.rect(self.screen, "green", (self.food_x, self.food_y, 10, 10), 0)
 
     def run(self):
-        while self.running:
+        while True:
             self.event_handler()
             self.update()
             self.draw()
-        if not self.running:
-            pass
 
 
 if __name__ == "__main__":
