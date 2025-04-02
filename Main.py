@@ -8,9 +8,9 @@ class Snake:
         pg.init()
         self.screen = pg.display.set_mode((1400, 800))
         self.clock = pg.time.Clock()
-        self.position = [(695, 395), (695, 405), (695, 415)]
-        self.snake_x: int = 695
-        self.snake_y: int = 395
+        self.position = [(690, 390), (690, 400), (690, 410)]
+        self.snake_x: int = 690
+        self.snake_y: int = 390
         self.direction: int = 0
         self.snake_length: int = 3
         self.food: bool = False
@@ -49,26 +49,24 @@ class Snake:
     def check_collision(self):
         if (self.snake_x <= 0 or self.snake_x >= 1410
                 or self.snake_y <= 0 or self.snake_y >= 810):
-            self.position = [(695, 395), (695, 405), (695, 415)]
+            self.position = [(690, 390), (690, 405), (690, 415)]
             self.snake_length = 3
-            self.snake_x = 695
-            self.snake_y = 395
+            self.snake_x = 690
+            self.snake_y = 390
             self.direction = 0
 
-        for i in range(1, len(self.position)):
+        for i in range(1, len(self.position) - 1):
             if self.snake_x == self.position[i][0] and self.snake_y == self.position[i][1]:
-                self.position = [(695, 395), (695, 405), (695, 415)]
+                self.position = [(690, 390), (690, 400), (690, 410)]
                 self.snake_length = 3
-                self.snake_x = 695
-                self.snake_y = 395
+                self.snake_x = 690
+                self.snake_y = 390
                 self.direction = 0
 
     def snake_logic(self):
-        for i in range(10):
-            if ((self.food_x <= self.snake_x + i <= self.food_x + 10) and
-                    (self.food_y <= self.snake_y + i <= self.food_y + 10)):
-                self.snake_length += 1
-                self.food = False
+        if (self.food_x == self.snake_x) and (self.food_y == self.snake_y):
+            self.snake_length += 1
+            self.food = False
 
         if self.direction == 0:
             self.snake_y -= 10
@@ -96,6 +94,7 @@ class Snake:
             self.food_x: int = random.randrange(1, 135) * 10
             self.food_y: int = random.randrange(1, 75) * 10
             self.food = True
+            print(self.food_x, self.food_y)
 
     def food_draw(self):
         if self.food:
