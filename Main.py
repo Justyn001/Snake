@@ -8,11 +8,11 @@ class Snake:
         self.screen = pg.display.set_mode((1400, 800))
         self.clock = pg.time.Clock()
         self.font = pg.font.SysFont('Nimbus Roman No9 L', 30)
-        self.position = [(690, 390), (690, 400), (690, 410)]
+        self.position = [(690, 390), (690, 400), (690, 410), (690, 420), (690, 430), (690, 440)]
         self.snake_x: int = 690
         self.snake_y: int = 390
         self.direction: int = 0
-        self.snake_length: int = 3
+        self.snake_length: int = 6
         self.food: bool = False
         self.food_x: int = 0
         self.food_y: int = 0
@@ -33,7 +33,7 @@ class Snake:
                 self.direction = 3
 
     def update(self):
-        self.clock.tick(30)
+        self.clock.tick(15)
         fps: float = round(self.clock.get_fps(), 1)
         pg.display.set_caption(f"Sssnake   {fps}")
         self.snake_logic()
@@ -48,9 +48,9 @@ class Snake:
         pg.display.update()
 
     def check_collision(self):
-        if (self.snake_x < 0 or self.snake_x > 1410
-                or self.snake_y < 0 or self.snake_y > 810):
-            self.position = [(690, 390), (690, 405), (690, 415)]
+        if (self.snake_x < 0 or self.snake_x > 1390
+                or self.snake_y < 0 or self.snake_y > 790):
+            self.position = [(690, 390), (690, 400), (690, 410)]
             self.snake_length = 3
             self.snake_x = 690
             self.snake_y = 390
@@ -64,6 +64,20 @@ class Snake:
                 self.snake_y = 390
                 self.direction = 0
                 break
+
+    def check_danger(self, direction, snake_x, snake_y) -> list:
+        danger_list = [int]
+
+        danger_list.append(1) if snake_y-10 < 0 or snake_y - 10 in [x[1] for x in self.position]\
+            else danger_list.append(0)
+        danger_list.append(1) if snake_y+10 > 790 or snake_y + 10 in [x[1] for x in self.position]\
+            else danger_list.append(0)
+        danger_list.append(1) if snake_x-10 < 0 or snake_x - 10 in [x[0] for x in self.position]\
+            else danger_list.append(0)
+        danger_list.append(1) if snake_x+10 > 1390 or snake_x + 10 in [x[0] for x in self.position]\
+            else danger_list.append(0)
+
+        return danger_list
 
     def snake_logic(self):
         if (self.food_x == self.snake_x) and (self.food_y == self.snake_y):
@@ -93,8 +107,8 @@ class Snake:
 
     def food_logic(self):
         if not self.food:
-            self.food_x: int = random.randrange(1, 135) * 10
-            self.food_y: int = random.randrange(1, 75) * 10
+            self.food_x: int = random.randrange(9, 10) * 10
+            self.food_y: int = random.randrange(9, 10) * 10
             self.food = True
 
     def food_draw(self):
@@ -110,6 +124,7 @@ class Snake:
             self.event_handler()
             self.update()
             self.draw()
+            self.check_danger(self.direction, self.snake_x, self.snake_y)
 
 
 if __name__ == "__main__":
