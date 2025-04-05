@@ -1,21 +1,23 @@
 import pygame as pg
 import sys
 import random
+from agent import Agent
 
 class Snake:
-    def __init__(self) -> None:
+    def __init__(self, agent) -> None:
         pg.init()
         self.screen = pg.display.set_mode((1400, 800))
         self.clock = pg.time.Clock()
         self.font = pg.font.SysFont('Nimbus Roman No9 L', 30)
-        self.position = [(690, 390), (690, 400), (690, 410), (690, 420), (690, 430), (690, 440)]
+        self.position = [(690, 390), (690, 400), (690, 410)]
         self.snake_x: int = 690
         self.snake_y: int = 390
         self.direction: int = 0
-        self.snake_length: int = 6
+        self.snake_length: int = 3
         self.food: bool = False
         self.food_x: int = 0
         self.food_y: int = 0
+        self.agent = agent
 
     def event_handler(self):
         for event in pg.event.get():
@@ -23,17 +25,28 @@ class Snake:
                 pg.quit()
                 sys.exit()
 
-            elif event.type == pg.KEYDOWN and event.key == pg.K_UP and self.direction != 1:
-                self.direction = 0
-            elif event.type == pg.KEYDOWN and event.key == pg.K_DOWN and self.direction != 0:
-                self.direction = 1
-            elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT and self.direction != 3:
-                self.direction = 2
-            elif event.type == pg.KEYDOWN and event.key == pg.K_RIGHT and self.direction != 2:
-                self.direction = 3
+        move_direction = agent.choose_action()
+
+        if self.direction == 0 and move_direction != 1:
+            self.direction = move_direction
+        elif self.direction == 1 and move_direction != 0:
+            self.direction = move_direction
+        elif self.direction == 2 and move_direction != 3:
+            self.direction = move_direction
+        elif self.direction == 3 and self.direction != 2:
+            self.direction = move_direction
+
+            # elif event.type == pg.KEYDOWN and event.key == pg.K_UP and self.direction != 1:
+            #     self.direction = 0
+            # elif event.type == pg.KEYDOWN and event.key == pg.K_DOWN and self.direction != 0:
+            #     self.direction = 1
+            # elif event.type == pg.KEYDOWN and event.key == pg.K_LEFT and self.direction != 3:
+            #     self.direction = 2
+            # elif event.type == pg.KEYDOWN and event.key == pg.K_RIGHT and self.direction != 2:
+            #     self.direction = 3
 
     def update(self):
-        self.clock.tick(15)
+        self.clock.tick(30)
         fps: float = round(self.clock.get_fps(), 1)
         pg.display.set_caption(f"Sssnake   {fps}")
         self.snake_logic()
@@ -65,20 +78,6 @@ class Snake:
                 self.direction = 0
                 break
 
-    def check_danger(self, direction, snake_x, snake_y) -> list:
-        danger_list = [int]
-
-        danger_list.append(1) if snake_y-10 < 0 or snake_y - 10 in [x[1] for x in self.position]\
-            else danger_list.append(0)
-        danger_list.append(1) if snake_y+10 > 790 or snake_y + 10 in [x[1] for x in self.position]\
-            else danger_list.append(0)
-        danger_list.append(1) if snake_x-10 < 0 or snake_x - 10 in [x[0] for x in self.position]\
-            else danger_list.append(0)
-        danger_list.append(1) if snake_x+10 > 1390 or snake_x + 10 in [x[0] for x in self.position]\
-            else danger_list.append(0)
-
-        return danger_list
-
     def snake_logic(self):
         if (self.food_x == self.snake_x) and (self.food_y == self.snake_y):
             self.snake_length += 1
@@ -107,8 +106,8 @@ class Snake:
 
     def food_logic(self):
         if not self.food:
-            self.food_x: int = random.randrange(9, 10) * 10
-            self.food_y: int = random.randrange(9, 10) * 10
+            self.food_x: int = random.randrange(1, 139) * 10
+            self.food_y: int = random.randrange(1, 79) * 10
             self.food = True
 
     def food_draw(self):
@@ -124,10 +123,13 @@ class Snake:
             self.event_handler()
             self.update()
             self.draw()
-            self.check_danger(self.direction, self.snake_x, self.snake_y)
+            self.agent.check_danger(self.position, self.snake_x, self.snake_y)
+            print(self.agent.get_position(game))
+
 
 
 if __name__ == "__main__":
-    game = Snake()
+    agent = Agent()
+    game = Snake(agent)
     game.run()
 
