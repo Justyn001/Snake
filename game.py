@@ -1,10 +1,9 @@
 import pygame as pg
 import sys
 import random
-from agent import Agent
 
 class Snake:
-    def __init__(self, agent) -> None:
+    def __init__(self) -> None:
         pg.init()
         self.screen = pg.display.set_mode((1400, 800))
         self.clock = pg.time.Clock()
@@ -17,15 +16,13 @@ class Snake:
         self.food: bool = False
         self.food_x: int = 0
         self.food_y: int = 0
-        self.agent = agent
+        self.run()
 
-    def event_handler(self):
+    def event_handler(self, move_direction):
         for event in pg.event.get():
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
                 pg.quit()
                 sys.exit()
-
-        move_direction = agent.choose_action()
 
         if self.direction == 0 and move_direction != 1:
             self.direction = move_direction
@@ -123,13 +120,5 @@ class Snake:
             self.event_handler()
             self.update()
             self.draw()
-            self.agent.check_danger(self.position, self.snake_x, self.snake_y)
-            print(self.agent.get_position(game))
 
-
-
-if __name__ == "__main__":
-    agent = Agent()
-    game = Snake(agent)
-    game.run()
 

@@ -1,11 +1,13 @@
 import random
+from game import Snake
+
 
 class Agent:
     def __init__(self):
         self.actions = [0, 1, 2, 3]
         self.memory = []
 
-    def get_position(self, game):
+    def get_position(self):
         snake_x, snake_y = game.snake_x, game.snake_y
         direction = game.direction
         food_x, food_y = game.food_x, game.food_y
@@ -35,9 +37,10 @@ class Agent:
     def store_experience(self):
         self.memory.append(self.get_position())
 
-
-
-
+if __name__ == "__main__":
+    game = Snake()
+    agent = Agent()
+    game.run()
 
 
 
