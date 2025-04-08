@@ -8,17 +8,26 @@ class Snake:
         self.screen = pg.display.set_mode((1400, 800))
         self.clock = pg.time.Clock()
         self.font = pg.font.SysFont('Nimbus Roman No9 L', 30)
+        self.position = None
+        self.snake_x, self.snake_y = 500, 500
+        self.direction = None
+        self.snake_length = None
+        self.food = True
+        self.food_x, self.food_y = 500, 80
+        self.game_status = False
+        self.restart()
+
+
+    def restart(self):
         self.position = [(690, 390), (690, 400), (690, 410)]
         self.snake_x: int = 690
         self.snake_y: int = 390
         self.direction: int = 0
         self.snake_length: int = 3
-        self.food: bool = False
-        self.food_x: int = 0
-        self.food_y: int = 0
-        self.run()
+        self.game_status = True
 
     def event_handler(self, move_direction):
+        self.game_status = True
         for event in pg.event.get():
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
                 pg.quit()
@@ -60,19 +69,11 @@ class Snake:
     def check_collision(self):
         if (self.snake_x < 0 or self.snake_x > 1390
                 or self.snake_y < 0 or self.snake_y > 790):
-            self.position = [(690, 390), (690, 400), (690, 410)]
-            self.snake_length = 3
-            self.snake_x = 690
-            self.snake_y = 390
-            self.direction = 0
+            self.game_status = False
 
         for i in range(1, self.snake_length):
             if self.snake_x == self.position[i][0] and self.snake_y == self.position[i][1]:
-                self.position = [(690, 390), (690, 400), (690, 410)]
-                self.snake_length = 3
-                self.snake_x = 690
-                self.snake_y = 390
-                self.direction = 0
+                self.game_status = False
                 break
 
     def snake_logic(self):
@@ -115,10 +116,11 @@ class Snake:
         score = self.font.render(f"Score: {self.snake_length - 3}", True, "white")
         self.screen.blit(score, (0, 0))
 
-    def run(self):
-        while True:
-            self.event_handler()
-            self.update()
-            self.draw()
+    def run(self, agent):
+        if not self.game_status:
+            self.restart()
+        self.event_handler(agent.choose_action())
+        self.update()
+        self.draw()
 
 
