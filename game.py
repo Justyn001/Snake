@@ -5,25 +5,31 @@ import random
 class Snake:
     def __init__(self) -> None:
         pg.init()
-        self.screen = pg.display.set_mode((1400, 800))
+        self.screen = pg.display.set_mode((400, 300))
         self.clock = pg.time.Clock()
         self.font = pg.font.SysFont('Nimbus Roman No9 L', 30)
         self.position = None
-        self.snake_x, self.snake_y = 500, 500
+        self.snake_x, self.snake_y = 200, 150
         self.direction = None
         self.snake_length = None
         self.food = True
-        self.food_x, self.food_y = 500, 80
+        self.food_x, self.food_y = 300, 80
         self.game_status = False
+        self.best_score = 0
+        self.epoch_counter = 0
+        self.fps = 30
+        self.moves = 0
         self.restart()
 
 
     def restart(self):
-        self.position = [(690, 390), (690, 400), (690, 410)]
-        self.snake_x: int = 690
-        self.snake_y: int = 390
-        self.direction: int = 0
+        self.moves = 0
+        self.direction = random.choice([0, 1, 2, 3])
+        self.position = [(200, 150), (200, 160), (200, 170)]
+        self.snake_x: int = 200
+        self.snake_y: int = 150
         self.snake_length: int = 3
+        self.food_logic()
         self.game_status = True
 
     def event_handler(self, move_direction):
@@ -32,6 +38,8 @@ class Snake:
             if event.type == pg.QUIT or (event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE):
                 pg.quit()
                 sys.exit()
+            if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                self.fps = 15 if self.fps == 30 else 30
 
         if self.direction == 0 and move_direction != 1:
             self.direction = move_direction
@@ -52,7 +60,7 @@ class Snake:
             #     self.direction = 3
 
     def update(self):
-        self.clock.tick(30)
+        self.clock.tick(self.fps)
         fps: float = round(self.clock.get_fps(), 1)
         pg.display.set_caption(f"Sssnake   {fps}")
         self.snake_logic()
@@ -67,8 +75,8 @@ class Snake:
         pg.display.update()
 
     def check_collision(self):
-        if (self.snake_x < 0 or self.snake_x > 1390
-                or self.snake_y < 0 or self.snake_y > 790):
+        if (self.snake_x < 0 or self.snake_x > 390
+                or self.snake_y < 0 or self.snake_y > 290):
             self.game_status = False
 
         for i in range(1, self.snake_length):
@@ -76,10 +84,16 @@ class Snake:
                 self.game_status = False
                 break
 
+        # if self.moves > 500:
+        #     self.game_status = False
+
     def snake_logic(self):
         if (self.food_x == self.snake_x) and (self.food_y == self.snake_y):
             self.snake_length += 1
             self.food = False
+            self.moves = 0
+        else:
+            self.moves += 1
 
         if self.direction == 0:
             self.snake_y -= 10
@@ -104,8 +118,8 @@ class Snake:
 
     def food_logic(self):
         if not self.food:
-            self.food_x: int = random.randrange(1, 139) * 10
-            self.food_y: int = random.randrange(1, 79) * 10
+            self.food_x: int = random.randrange(1, 39) * 10
+            self.food_y: int = random.randrange(1, 29) * 10
             self.food = True
 
     def food_draw(self):
@@ -114,12 +128,22 @@ class Snake:
 
     def points_draw(self):
         score = self.font.render(f"Score: {self.snake_length - 3}", True, "white")
-        self.screen.blit(score, (0, 0))
 
-    def run(self, agent):
+        self.best_score = self.snake_length - 3 if self.snake_length - 3 > self.best_score else self.best_score
+        best_score_display = self.font.render(f"Best Score: {self.best_score}", True, "white")
+
+        epoch = self.font.render(f"Epoch: {self.epoch_counter}", True, "white")
+
+        self.screen.blit(score, (0, 0))
+        self.screen.blit(best_score_display, (0, 20))
+        self.screen.blit(epoch, (0, 40))
+
+    def run(self, action):
         if not self.game_status:
+            print(f"Game: {self.epoch_counter} Score: {self.snake_length - 3} Best score: {self.best_score}")
             self.restart()
-        self.event_handler(agent.choose_action())
+            self.epoch_counter += 1
+        self.event_handler(action)
         self.update()
         self.draw()
 

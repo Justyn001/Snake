@@ -1,15 +1,15 @@
 import torch
-from torch import nn
+import torch.nn as nn
+import torch.nn.functional as F
 
 class AiModel(nn.Module):
-    def __init__(self):
+    def __init__(self, input_dim=11, hidden_dim=256, output_dim=4):
         super().__init__()
-        self.layer1 = nn.Linear(in_features=10, out_features=16)
-        self.layer2 = nn.Linear(in_features=16, out_features=16)
-        self.layer3 = nn.Linear(in_features=16, out_features=4)
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, hidden_dim)
+        self.fc3 = nn.Linear(hidden_dim, output_dim)
 
-    def forward(self, x:torch.Tensor) -> torch.Tensor:
-        x = nn.ReLU(self.layer1(x))
-        x = nn.ReLU(self.layer2(x))
-        return self.layer3(x)
-
+    def forward(self, x):
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        return self.fc3(x)
